@@ -1,4 +1,4 @@
 /p.bat
 /a.py
-/__pycatch__
+/__pycache__
 /.env
