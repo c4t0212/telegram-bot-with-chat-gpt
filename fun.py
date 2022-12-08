@@ -7,8 +7,8 @@ import requests as req
 
 def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"使用方法:\n")
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f"/img [文字]\n")
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f"/txt [文字]\n")
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f"/p [文字]\n")
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f"/t [文字]\n")
 
 def test(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.message.chat_id, text="I'm no a bot, please talk to me!")
@@ -41,7 +41,6 @@ def set_header():
 def img(update: Update, context: CallbackContext):
     text = update.message.text[5:]
     dd['data']['img']['prompt'] = text
-    # print(dd['data'])
     res = json.loads(req.post(dd['url']['img'], headers=dd['header'], json=dd['data']['img']).text)
     for url in res['data']:
         rsp = req.get(url['url'])
