@@ -8,6 +8,12 @@ import requests as req
 
 def set_command(funName  : list):
         handler = []
+        ii = ['i', 'I', 'p', 'p', 'img']
+        tt = ['t', 'T', 'x', 'txt']
+        for i in ii:
+            handler.append(CommandHandler(i, img))
+        for i in tt:
+            handler.append(CommandHandler(i, txt))
         for fun in funName:
             handler.append(CommandHandler(fun, eval(fun)))
         for hd in handler:
@@ -20,7 +26,7 @@ if __name__ == '__main__':
     updater = Updater(token=token, use_context=True)
     dispatcher = updater.dispatcher
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    funName = ['start', 'test', 'img', 'txt']
+    funName = ['start', 'test']
     set_command(funName)
     updater.start_polling()
     updater.idle()
