@@ -39,7 +39,13 @@ def set_header():
     dd['header']['Authorization'] = os.getenv('OPENAI')
 
 def img(update: Update, context: CallbackContext):
-    text = update.message.text[5:]
+    text = update.message.text
+    if update.message.text[:4] == '/img':
+        text = update.message.text[5:]
+    else:
+        text = update.message.text[3:]
+    if text == '':
+        text = 'cute animate girl'
     dd['data']['img']['prompt'] = text
     res = json.loads(req.post(dd['url']['img'], headers=dd['header'], json=dd['data']['img']).text)
     for url in res['data']:
