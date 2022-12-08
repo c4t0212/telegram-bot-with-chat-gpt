@@ -8,7 +8,7 @@ import requests as req
 
 def set_command(funName  : list):
         handler = []
-        ii = ['i', 'I', 'p', 'p', 'img']
+        ii = ['i', 'I', 'p', 'P', 'img']
         tt = ['t', 'T', 'x', 'txt']
         for i in ii:
             handler.append(CommandHandler(i, img))

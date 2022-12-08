@@ -53,7 +53,13 @@ def img(update: Update, context: CallbackContext):
         context.bot.send_photo(chat_id=update.message.chat_id, photo=url['url'])
 
 def txt(update: Update, context: CallbackContext):
-    text = update.message.text[5:]
+    text = update.message.text
+    if update.message.text[:4] == '/txt':
+        text = update.message.text[5:]
+    else:
+        text = update.message.text[3:]
+    if text == '':
+        text = 'cute animate cat girl'
     dd['data']['text']['prompt'] = text
     res = json.loads(req.post(dd['url']['text'], headers=dd['header'], json=dd['data']['text']).text)
     context.bot.send_message(chat_id=update.message.chat_id, text=res['choices'][0]['text'])
