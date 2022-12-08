@@ -46,7 +46,6 @@ def img(update: Update, context: CallbackContext):
     for url in res['data']:
         rsp = req.get(url['url'])
         context.bot.send_photo(chat_id=update.message.chat_id, photo=url['url'])
-        print('{} printed {}'.format(update.message.chat.username, url['url']), file=sys.stderr)
 
 def txt(update: Update, context: CallbackContext):
     text = update.message.text[5:]
