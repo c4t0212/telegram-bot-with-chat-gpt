@@ -34,7 +34,6 @@ def set_header():
 def img(update: Update, context: CallbackContext):
     text = update.message.text[5:]
     dd['data']['prompt'] = text
-    # print(dd['data'])
     res = json.loads(req.post(dd['url'], headers=dd['header'], json=dd['data']).text)
     for url in res['data']:
         rsp = req.get(url['url'])
