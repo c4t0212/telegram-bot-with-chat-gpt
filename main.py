@@ -6,10 +6,10 @@ from dotenv import load_dotenv
 from fun import *
 import requests as req
 
-def set_command():
+def set_command(funName  : list):
         handler = []
-        for name in funName:
-            handler.append(CommandHandler(name, eval(name)))
+        for fun in funName:
+            handler.append(CommandHandler(fun, eval(fun)))
         for hd in handler:
             dispatcher.add_handler(hd)
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     updater = Updater(token=token, use_context=True)
     dispatcher = updater.dispatcher
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    funName = ['start', 'test', 'text', 'img']
-    set_command()
+    funName = ['start', 'test', 'img', 'txt']
+    set_command(funName)
     updater.start_polling()
     updater.idle()
