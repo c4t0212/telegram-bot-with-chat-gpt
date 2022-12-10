@@ -18,6 +18,7 @@ def set_command(funName  : list):
             handler.append(CommandHandler(fun, eval(fun)))
         for hd in handler:
             dispatcher.add_handler(hd)
+        updater.dispatcher.add_handler(CallbackQueryHandler(get_img))
 
 if __name__ == '__main__':
     load_dotenv()
