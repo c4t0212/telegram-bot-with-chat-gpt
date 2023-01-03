@@ -27,7 +27,7 @@ if __name__ == '__main__':
     updater = Updater(token=token, use_context=True)
     dispatcher = updater.dispatcher
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    funName = ['start', 'test']
+    funName = ['start', 'test', 'ig', 'yt']
     set_command(funName)
     updater.start_polling()
     updater.idle()
