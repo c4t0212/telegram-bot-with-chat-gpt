@@ -138,7 +138,7 @@ def ig(update: Update, context: CallbackContext):
     wb.quit()   
 
 from pytube import YouTube as Youtube
-from pytube.cli import on_progress
+# from pytube.cli import on_progress
 import sys
 # -*- coding:utf-8 -*-
 def yt(update: Update, context: CallbackContext):
@@ -148,7 +148,8 @@ def yt(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
         return
     context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
-    yt = Youtube(url,on_progress_callback=on_progress)
+    yt = Youtube(url)
+    # yt = Youtube(url,on_progress_callback=on_progress)
     filename = yt.streams.filter().get_audio_only().default_filename
     optpath = f'{filename}'
     yt.streams.filter(only_audio=True).first().download()
@@ -156,4 +157,5 @@ def yt(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.message.chat_id, text='上傳中...')
     context.bot.send_document(chat_id=update.message.chat.id, document=open(f'{optpath}', 'rb'), timeout=1000)
     context.bot.send_message(chat_id=update.message.chat_id, text='上傳完畢')
+    print(yt.streams.filter().get_audio_only().default_filename)
     os.remove(optpath)
