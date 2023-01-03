@@ -144,15 +144,14 @@ import sys
 def yt(update: Update, context: CallbackContext):
     url = update.message.text[4:]
     # targetPath = './mp3'
-    targetPath = '.\\mp3'
     if url == '':
         context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
         return
     context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
     yt = Youtube(url,on_progress_callback=on_progress)
     filename = yt.streams.filter().get_audio_only().default_filename
-    optpath = f'{targetPath}\\{filename}'
-    yt.streams.filter(only_audio=True).first().download(output_path=targetPath)
+    optpath = f'{filename}'
+    yt.streams.filter(only_audio=True).first().download()
     context.bot.send_message(chat_id=update.message.chat_id, text='下載完畢')
     context.bot.send_message(chat_id=update.message.chat_id, text='上傳中...')
     context.bot.send_document(chat_id=update.message.chat.id, document=open(f'{optpath}', 'rb'), timeout=1000)
