@@ -151,11 +151,11 @@ def yt(update: Update, context: CallbackContext):
     yt = Youtube(url)
     # yt = Youtube(url,on_progress_callback=on_progress)
     filename = yt.streams.filter().get_audio_only().default_filename
-    optpath = f'{filename}'
-    yt.streams.filter(only_audio=True).first().download()
+    optpath = filename[:-3] + 'mp3'
+    yt.streams.filter(only_audio=True).first().download(filename=optpath)
     context.bot.send_message(chat_id=update.message.chat_id, text='下載完畢')
     context.bot.send_message(chat_id=update.message.chat_id, text='上傳中...')
-    context.bot.send_document(chat_id=update.message.chat.id, document=open(f'{optpath}', 'rb'), timeout=1000)
+    context.bot.send_audio(chat_id=update.message.chat.id, audio=open(f'{optpath}', 'rb'), timeout=1000)
     context.bot.send_message(chat_id=update.message.chat_id, text='上傳完畢')
-    print(yt.streams.filter().get_audio_only().default_filename)
+    print(optpath)
     os.remove(optpath)
