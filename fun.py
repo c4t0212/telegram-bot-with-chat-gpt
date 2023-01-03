@@ -5,6 +5,7 @@ from telegram.ext import *
 import json
 import requests as req
 
+
 def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"使用方法:\n")
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"/p [文字]\n")
@@ -135,4 +136,32 @@ def ig(update: Update, context: CallbackContext):
         # finally:
         #     pass
     wb.quit()   
-    
+
+from pytube import YouTube as Youtube
+from pytube.cli import on_progress
+import sys
+# -*- coding:utf-8 -*-
+def yt(update: Update, context: CallbackContext):
+    url = update.message.text[4:]
+    # targetPath = './mp3'
+    targetPath = '.\\mp3'
+    if url == '':
+        context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
+        return
+    context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
+    yt = Youtube(url,on_progress_callback=on_progress)
+    # yt.streams.first().download(output_path=targetPath, filename=f'{yt.title}.mp3')
+    filename = yt.streams.filter().get_audio_only().default_filename
+    optpath = f'{targetPath}\\{filename}.mp3'
+    yt.streams.filter().get_audio_only().download(output_path=targetPath, filename=f'{filename}.mp3')
+    # yt.streams.filter(only_audio=True).get_highest_resolution().download(output_path=targetPath, filename=f'{yt.title}.mp3')
+    context.bot.send_message(chat_id=update.message.chat_id, text='下載完畢')
+    context.bot.send_message(chat_id=update.message.chat_id, text='上傳中...')
+    # update.getUpdates(timeout=1000)
+    # update.timeout = 1000
+    # tt = telegram.utils.request.Request(connect_timeout=5, read_timeout=20, write_timeout=tt)
+    # with open(optpath, 'rb') as f:
+    #     context.bot.send_file(chat_id=update.message.chat.id, audio=f, write_timeout=20)
+    context.bot.send_document(chat_id=update.message.chat.id, document=open(f'{optpath}', 'rb'), timeout=1000)
+    # context.bot.send_audio(chat_id=update.message.chat.id, audio=open(f'{optpath}', 'rb'))
+    context.bot.send_message(chat_id=update.message.chat_id, text='上傳完畢')
