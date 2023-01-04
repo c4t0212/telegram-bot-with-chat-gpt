@@ -1,10 +1,4 @@
-import logging
-import os
-from telegram import *
-from telegram.ext import *
-from dotenv import load_dotenv
 from fun import *
-import requests as req
 
 def set_command(funName  : list):
         handler = []

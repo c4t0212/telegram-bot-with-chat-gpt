@@ -1,10 +1,4 @@
-from telegram import *
-import os
-from dotenv import load_dotenv
-from telegram.ext import *
-import json
-import requests as req
-
+import import_lib
 
 def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"使用方法:\n")
@@ -79,14 +73,6 @@ def txt(update: Update, context: CallbackContext):
     res = json.loads(req.post(dd['url']['text'], headers=dd['header'], json=dd['data']['text']).text)
     context.bot.send_message(chat_id=update.message.chat_id, text=res['choices'][0]['text'])
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from time import sleep
-
 def check_element_is_exist(wb, xpath):
     try:
         wb.find_element(By.XPATH, xpath)
@@ -137,10 +123,7 @@ def ig(update: Update, context: CallbackContext):
         #     pass
     wb.quit()   
 
-from pytube import YouTube as Youtube
-# from pytube.cli import on_progress
-import sys
-# -*- coding:utf-8 -*-
+
 def yt(update: Update, context: CallbackContext):
     url = update.message.text[4:]
     # targetPath = './mp3'
