@@ -63,12 +63,11 @@ async def yt(update: Update, context: CallbackContext):
     msg = await context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
     yt = Youtube(url)
     # yt = Youtube(url,on_progress_callback=on_progress)
-    filename = yt.streams.filter().get_audio_only().default_filename
-    optpath = filename[:-3] + 'mp3'
-    yt.streams.filter(only_audio=True).first().download(filename=optpath)
+    file = yt.streams.filter().get_audio_only().title + '.mp3'
+    yt.streams.filter(only_audio=True).first().download(filename=file)
     msg = await context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='下載完畢')
     msg = await context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳中...')
-    await context.bot.send_audio(chat_id=update.message.chat.id, audio=open(f'{optpath}', 'rb'), write_timeout=1000, read_timeout=1000)
+    await context.bot.send_audio(chat_id=update.message.chat.id, audio=open(file, 'rb'), write_timeout=1000, read_timeout=1000)
     msg = await context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳完畢')
-    print(optpath)
-    os.remove(optpath)
+    print(file)
+    os.remove(file)
