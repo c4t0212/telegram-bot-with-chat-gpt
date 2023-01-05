@@ -1,59 +1,53 @@
-import import_lib
+# import import_lib
+import os
+import sys
+import json
+import logging
+import requests as req
+from time import sleep
+from telegram import *
+from telegram.ext import *
+from dotenv import load_dotenv
+# from pytube.cli import on_progress
+from pytube import YouTube as Youtube
+import openai
+
 
 def start(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f"使用方法:\n")
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f"/p [文字]\n")
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f"/t [文字]\n")
-
-async def test(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.message.chat_id, text="I'm no a bot, please talk to me!")
-
-dd = {
-    'url' : {
-        'img' : 'https://api.openai.com/v1/images/generations',
-        'text' : 'https://api.openai.com/v1/completions'
-    },
-    'header' : {
-        'Content-Type': 'application/json',
-        'Authorization': ''
-    },
-    'data' : {
-        'img': {
-            "prompt": '',
-            "n": 1, 
-            "size": "1024x1024"
-        },
-        'text': {
-            'model':'babbage-search-document',
-            'prompt': ''
-        }
-    }
-}
-def set_header():
-    auth = os.getenv('AUTH')
-    dd['header']['Authorization'] = os.getenv('OPENAI')
+    msg = \
+    """
+    使用方法:
+    圖片生成: /img [文字]
+    IG貼文圖片抓取: /ig [IG網址]
+    YT MP3下載: /yt [YT網址]
+    """
+    context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
 
 def get_img(update: Update, context: CallbackContext):
     query = update.callback_query
-    dd['data']['img']['n'] = int(query.data[:1])
-    dd['data']['img']['prompt'] = query.data[1:]
-    res = json.loads(req.post(dd['url']['img'], headers=dd['header'], json=dd['data']['img']).text)
-    query.edit_message_text(text=f"生成中...")
+    query.edit_message_text(text=f"生成中...", reply_markup=None)
+    imgNums, text = query.data.split(' ', 1)
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': os.getenv('OPENAI_TOKEN'),
+    }
+    body = {
+        'prompt': text,
+        'n': int(imgNums),
+        'size': '1024x1024'
+    }
+
+    res = json.loads(req.post('https://api.openai.com/v1/images/generations', headers=headers, json=body).text)
     for url in res['data']:
-        rsp = req.get(url['url'])
         context.bot.send_photo(update.callback_query.message.chat.id, photo=url['url'])
-    query.answer()
+
     context.bot.send_message(chat_id=update.callback_query.message.chat.id, text='生成完畢 uwu',reply_markup=InlineKeyboardMarkup([[
         InlineKeyboardButton("重新生成", callback_data=query.data)]]))
 
 def img(update: Update, context: CallbackContext):
-    text = update.message.text
-    if update.message.text[:4] == '/img':
-        text = update.message.text[5:]
-    else:
-        text = update.message.text[3:]
-    if text == '':
-        text = 'cute animate girl'
+    text = update.message.text[4:]
+    test = 'cute animate girl' if text == '' else text
 
     MAXN = 5
     update.message.reply_text('選擇要生成幾張圖片', reply_markup=InlineKeyboardMarkup([[
@@ -61,84 +55,19 @@ def img(update: Update, context: CallbackContext):
     ]]))
     return get_img
 
-def txt(update: Update, context: CallbackContext):
-    text = update.message.text
-    if update.message.text[:4] == '/txt':
-        text = update.message.text[5:]
-    else:
-        text = update.message.text[3:]
-    if text == '':
-        text = 'cute animate cat girl'
-    dd['data']['text']['prompt'] = text
-    res = json.loads(req.post(dd['url']['text'], headers=dd['header'], json=dd['data']['text']).text)
-    context.bot.send_message(chat_id=update.message.chat_id, text=res['choices'][0]['text'])
-
-def check_element_is_exist(wb, xpath):
-    try:
-        wb.find_element(By.XPATH, xpath)
-        return True
-    except:
-        return False
-
-def get_xpath_attribute(wb : webdriver, xpath : str, attribute : str):
-    return wb.find_element(By.XPATH, xpath).get_attribute(attribute)
-
-
-def ig(update: Update, context: CallbackContext):
-    text = update.message.text[4:]
-    # if update.message.text[:3] == '/ig':
-    #     text = update.message.text[4:]
-    if text == '':
-        context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
-        return
-    context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
-
-    wb = webdriver.Chrome()
-    # driver = webdriver.Remote(service.service_url)
-    wb.get(text)
-    try:
-        WebDriverWait(wb, 10).until(EC.presence_of_element_located((By.CLASS_NAME, '_aagv')))
-    finally:
-        pass
-
-    imgLink = []
-    try:
-        while True:
-            sleep(1)
-            imgLink.append(get_xpath_attribute(wb, '//div[@class="_aagv"]/img', 'src'))
-            wb.find_element(By.XPATH, '//button[@class=" _afxw"]').click()
-    except:
-        pass
-
-
-    n = len(imgLink)
-    print(update)
-    for i in range(len(imgLink)):
-        print(imgLink[i])
-        context.bot.send_photo(update.message.chat.id, photo=imgLink[i])
-        # try:
-        #     wb.get(imgLink[i])
-        #     WebDriverWait(wb, 10).until(EC.presence_of_element_located((By.TAG_NAME, 'img')))
-        # finally:
-        #     pass
-    wb.quit()   
-
-
 def yt(update: Update, context: CallbackContext):
     url = update.message.text[4:]
-    # targetPath = './mp3'
     if url == '':
         context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
         return
-    context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
+    msg = context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
     yt = Youtube(url)
     # yt = Youtube(url,on_progress_callback=on_progress)
-    filename = yt.streams.filter().get_audio_only().default_filename
-    optpath = filename[:-3] + 'mp3'
-    yt.streams.filter(only_audio=True).first().download(filename=optpath)
-    context.bot.send_message(chat_id=update.message.chat_id, text='下載完畢')
-    context.bot.send_message(chat_id=update.message.chat_id, text='上傳中...')
-    context.bot.send_audio(chat_id=update.message.chat.id, audio=open(f'{optpath}', 'rb'), timeout=1000)
-    context.bot.send_message(chat_id=update.message.chat_id, text='上傳完畢')
-    print(optpath)
-    os.remove(optpath)
+    file = yt.streams.filter().get_audio_only().title + '.mp3'
+    yt.streams.filter(only_audio=True).first().download(filename=file)
+    msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='下載完畢')
+    msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳中...')
+    context.bot.send_audio(chat_id=update.message.chat.id, audio=open(file, 'rb'), timeout=1000)
+    msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳完畢')
+    print(f'{file} + " " + {yt.streams.filter(only_audio=True).first().filesize_mb} + "MB"')
+    os.remove(file)
