@@ -69,5 +69,5 @@ def yt(update: Update, context: CallbackContext):
     msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳中...')
     context.bot.send_audio(chat_id=update.message.chat.id, audio=open(file, 'rb'), timeout=1000)
     msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳完畢')
-    print(file)
+    print(f'{file} + " " + {yt.streams.filter(only_audio=True).first().filesize_mb} + "MB"')
     os.remove(file)

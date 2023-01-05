@@ -8,7 +8,7 @@ class TelegramBot():
     def __init__(self):
         load_dotenv()
         token = os.getenv('TOKEN')
-        self.app = Updater(token=token, use_context=True, base_url='http://0.0.0.0:8080/bot')
+        self.app = Updater(token=token, use_context=True, base_url='tg-api.dong3.me:8081/bot')
         # self.app = Updater(token=token, use_context=True)
         self.CommandHandlerName = ['start', 'img', 'yt']
         self.CallbackQueryHandlerName = ['get_img']
