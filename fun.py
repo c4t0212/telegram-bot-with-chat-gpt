@@ -65,15 +65,42 @@ class TelegramBotFunction():
                 InlineKeyboardButton(str(x), callback_data=x) for x in range(1, MAXN+1)
             ]], one_time_keyboard=True))
             return self.get_img
-        elif self.args == 'yt':
-            self.args = text
+        elif self.args[:2] == 'yt':
+            if self.args == 'ytv':
+                self.args = '-' + text
+            else:
+                self.args = text
             return self.get_yt(update, context)
     
+    def get_res(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+        query.edit_message_text(text=f"下載中...")
+        resolution = query.data + 'p'
+        yt = self.args
+        file = yt.streams.filter(res=resolution).first().title + '.mp4'
+        yt.streams.filter(res=resolution).first().download(filename=file)
+        context.bot.send_video(chat_id=update.callback_query.message.chat.id, video=open(file, 'rb'))
+        os.remove(file)
+        print(file)
+        context.bot.send_message(chat_id=update.callback_query.message.chat.id, text='上傳完畢')
+
     def get_yt(self, update: Update, context: CallbackContext):
-        url = update.message.text
         msg = context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
+        url = update.message.text
         yt = Youtube(url)
         # yt = Youtube(url,on_progress_callback=on_progress)
+        file = ''
+        if self.args[0] == '-':
+            resolution = [int(i.split("p")[0]) for i in (list(dict.fromkeys([i.resolution for i in yt.streams if i.resolution])))]
+            # resolution = [i for i in (list(dict.fromkeys([i.resolution for i in yt.streams if i.resolution])))]
+            # file = resolution.title + '.' + resolution.subtype
+            resolution.sort()
+            self.args = yt
+            msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text=f'選擇要下載的畫質\n', reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton(str(x), callback_data=x) for x in resolution
+            ]], one_time_keyboard=True))     
+            return self.get_res
+        
         file = yt.streams.filter().get_audio_only().title + '.mp3'
         yt.streams.filter(only_audio=True).first().download(filename=file)
         msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳中...')
@@ -82,8 +109,13 @@ class TelegramBotFunction():
         print(f'{file} file size: {yt.streams.filter().get_audio_only().filesize_mb} MB')
         os.remove(file)
 
-    def yt(self, update: Update, context: CallbackContext):
+    def yt_audio(self, update: Update, context: CallbackContext):
         self.args = 'yt'
+        context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
+        context.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, self.get_text))
+
+    def yt_video(self, update: Update, context: CallbackContext):
+        self.args = 'ytv'
         context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
         context.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, self.get_text))
 
