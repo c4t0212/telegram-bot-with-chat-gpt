@@ -71,16 +71,13 @@ class TelegramBotFunction():
     
     def get_yt(self, update: Update, context: CallbackContext):
         url = update.message.text
-        if url == '':
-            context.bot.send_message(chat_id=update.message.chat_id, text='請貼上連結 >w<')
-            return
         msg = context.bot.send_message(chat_id=update.message.chat_id, text='下載中...')
         yt = Youtube(url)
         # yt = Youtube(url,on_progress_callback=on_progress)
         file = yt.streams.filter().get_audio_only().title + '.mp3'
         yt.streams.filter(only_audio=True).first().download(filename=file)
         msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳中...')
-        msg = context.bot.send_audio(chat_id=update.message.chat_id, audio=open(file, 'rb'))
+        context.bot.send_audio(chat_id=update.message.chat_id, audio=open(file, 'rb'))
         msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳完畢')
         print(f'{file} file size: {yt.streams.filter().get_audio_only().filesize_mb} MB')
         os.remove(file)
