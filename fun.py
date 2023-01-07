@@ -64,7 +64,7 @@ class TelegramBotFunction():
             update.message.reply_text('選擇要生成幾張圖片', reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton(str(x), callback_data=x) for x in range(1, MAXN+1)
             ]], one_time_keyboard=True))
-            return self.get_yt(update, context)
+            return self.get_img
         elif self.args == 'yt':
             self.args = text
             return self.get_yt(update, context)
