@@ -16,6 +16,7 @@ import openai
 class TelegramBotFunction():
     def __init__(self):
         self.args = ''
+        self.path = './media/'
     def start(self, update: Update, context: CallbackContext):
         msg = \
         """
@@ -78,8 +79,8 @@ class TelegramBotFunction():
         resolution = query.data + 'p'
         yt = self.args
         file = yt.streams.filter(res=resolution).first().title + '.mp4'
-        yt.streams.filter(res=resolution).first().download(filename=file)
-        context.bot.send_video(chat_id=update.callback_query.message.chat.id, video=open(file, 'rb'))
+        yt.streams.filter(res=resolution).first().download(output_path=self.path ,filename=file)
+        context.bot.send_video(chat_id=update.callback_query.message.chat.id, video=open(self.path+file, 'rb'))
         os.remove(file)
         print(file)
         context.bot.send_message(chat_id=update.callback_query.message.chat.id, text='上傳完畢')
@@ -100,9 +101,9 @@ class TelegramBotFunction():
             return self.get_res
         
         file = yt.streams.filter().get_audio_only().title + '.mp3'
-        yt.streams.filter(only_audio=True).first().download(filename=file)
+        yt.streams.filter(only_audio=True).first().download(output_path=self.path ,filename=file)
         msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳中...')
-        context.bot.send_audio(chat_id=update.message.chat_id, audio=open(file, 'rb'))
+        context.bot.send_audio(chat_id=update.message.chat_id, audio=open(self.path+file, 'rb'))
         msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳完畢')
         print(f'{file} file size: {yt.streams.filter().get_audio_only().filesize_mb} MB')
         os.remove(file)
