@@ -81,7 +81,7 @@ class TelegramBotFunction():
         file = yt.streams.filter(res=resolution).first().title + '.mp4'
         yt.streams.filter(res=resolution).first().download(output_path=self.path ,filename=file)
         context.bot.send_video(chat_id=update.callback_query.message.chat.id, video=open(self.path+file, 'rb'))
-        os.remove(file)
+        os.remove(self.path + file)
         print(file)
         context.bot.send_message(chat_id=update.callback_query.message.chat.id, text='上傳完畢')
 
@@ -106,7 +106,7 @@ class TelegramBotFunction():
         context.bot.send_audio(chat_id=update.message.chat_id, audio=open(self.path+file, 'rb'))
         msg = context.bot.edit_message_text(chat_id=update.message.chat_id, message_id=msg.message_id, text='上傳完畢')
         print(f'{file} file size: {yt.streams.filter().get_audio_only().filesize_mb} MB')
-        os.remove(file)
+        os.remove(self.path + file)
 
     def yt_audio(self, update: Update, context: CallbackContext):
         self.args = 'yt'
